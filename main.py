@@ -108,4 +108,5 @@ def get_results():
 
 
 if __name__ == "__main__":
-    app.run(port=os.environ['PORT'])
+    app.run(
+        '0.0.0.0', port=os.environ['PORT'])
