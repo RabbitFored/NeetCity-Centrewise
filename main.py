@@ -76,7 +76,7 @@ def home():
 def get_cities():
 
     sta = request.form['state']
-    cities = []
+    cities = ["ALL"]
     for state in data["states"]:
         state_name = state["name"]
         if sta == state_name:
@@ -88,14 +88,22 @@ def get_cities():
 def get_results():
     state_name = request.form['state']
     city_name = request.form['city'].replace("/", ",")
+    if city_name== "ALL":
+        directory = f"states/{state_name}/"
+        paths = []
+        for i in os.walk(directory):
+         for j in i[2]:
+          if j.endswith('.pdf'):
+            paths.append( os.path.join(i[0], j))
 
-    dir = f"states/{state_name}/{city_name}"
+    else:
+        dir = f"states/{state_name}/{city_name}"
 
-    paths = [
+        paths = [
       os.path.join(dir, f)
         for f in sorted(os.listdir(dir)) if f.endswith(".pdf")
     ]
-
+    #print(paths)
     min_mark = int(request.form['min_mark'])
     max_mark = int(request.form['max_mark'])
     NoOfStudents = 0
