@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Marks</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        form {
+            background: #fff;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        form label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+
+        form input, form select, form button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0 20px;
+        }
+
+        form button {
+            background: #333;
+            color: #fff;
+            border: 0;
+            cursor: pointer;
+        }
+
+        form button:hover {
+            background: #555;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        table th, table td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        a {
+            display: block;
+            text-align: center;
+            margin: 20px 0;
+            color: #333;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>NEET 2024 - City and Centre wise results</h1>
+        <form id="marksForm">
+            <label for="state">State:</label>
+            <select name="state" id="state" required>
+                <option value="">Select a state</option>
+                {% for state in states %}
+                    <option value="{{ state }}">{{ state }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="city">City:</label>
+            <select name="city" id="city" required>
+                <option value="">Select a city</option>
+            </select>
+
+            <label for="min_mark">Min Mark:</label>
+            <input type="number" name="min_mark" id="min_mark" required>
+
+            <label for="max_mark">Max Mark:</label>
+            <input type="number" name="max_mark" id="max_mark" required>
+
+            <button type="submit">Get Results</button>
+        </form>
+        <div id="results" style="display: none;">
+            <h2>Filtered Results</h2>
+            <p>Number of students with marks between <span id="minMark"></span> and <span id="maxMark"></span>: <span id="countInRange"></span></p>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $('#state').change(function() {
+                var state = $(this).val();
+                $.ajax({
+                    url: '/get_cities',
+                    method: 'POST',
+                    data: { state: state },
+                    success: function(data) {
+                        $('#city').empty().append('<option value="">Select a city</option>');
+                        $.each(data, function(index, value) {
+                            $('#city').append('<option value="' + value + '">' + value + '</option>');
+                        });
+                    }
+                });
+            });
+
+            $('#marksForm').submit(function(event) {
+                event.preventDefault();
+                $.ajax({
+                    url: '/get_results',
+                    method: 'POST',
+                    data: $(this).serialize(),
+                    success: function(data) {
+                        $('#results').show();
+                        $('#minMark').text(data.min_mark);
+                        $('#maxMark').text(data.max_mark);
+                        $('#countInRange').text(data.count_in_range);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

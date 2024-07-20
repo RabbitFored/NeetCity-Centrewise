@@ -1,0 +1,3 @@
+PyMuPDF
+urllib3
+Flask
