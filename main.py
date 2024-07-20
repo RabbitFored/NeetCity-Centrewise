@@ -18,13 +18,13 @@ def do():
     centre_codes = []
     for city in state["cities"]:
         city_name = city["name"].replace("/", ",")
-        path2 = f"/home/runner/Loader/states/{state_name}/{city_name}"
+        path2 = f"/states/{state_name}/{city_name}"
         if not os.path.exists(path2):
          os.mkdir(r"" + path2)
         for centre in city["centres"]:
             centre_code = centre["code"]
             url = f"https://neetfs.ntaonline.in/NEET_2024_Result/{centre_code}.pdf"
-            path3 = f"/home/runner/Loader/states/{state_name}/{city_name}/{centre_code}.pdf"
+            path3 = f"/states/{state_name}/{city_name}/{centre_code}.pdf"
             if not os.path.exists(path3):
               urllib.request.urlretrieve(url, path3)
             yield                  
