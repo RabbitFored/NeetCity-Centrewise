@@ -1,3 +1,4 @@
 PyMuPDF
 urllib3
 Flask
+requests
