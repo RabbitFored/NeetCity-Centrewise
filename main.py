@@ -2,7 +2,7 @@ import urllib
 import json
 import os
 import requests
-from flask import Flask, render_template, request, jsonify
+from quart import Quart,  render_template, request, jsonify
 import fitz  
 
 
@@ -60,22 +60,22 @@ def analyze_marks(data, min_mark, max_mark=720):
 
     return len(filtered_data), filtered_data
 
-app = Flask(__name__,template_folder="public")
+app = Quart(__name__,template_folder="public")
 f = open("centres-data.json", "rb")
 data =json.loads(f.read()) 
 
 @app.route("/")
-def home():
+async def home():
     states = []
     for state in data["states"]:
         state_name = state["name"]
         states.append(state_name)
-    return render_template('index.html', states=states)
+    return await render_template('index.html', states=states)
 
 @app.route('/get_cities', methods=['POST'])
-def get_cities():
-
-    sta = request.form['state']
+async def get_cities():
+    form = await request.form
+    sta = form['state']
     cities = ["ALL"]
     for state in data["states"]:
         state_name = state["name"]
@@ -85,9 +85,10 @@ def get_cities():
     return jsonify(cities)
 
 @app.route('/get_results', methods=['POST'])
-def get_results():
-    state_name = request.form['state']
-    city_name = request.form['city'].replace("/", ",")
+async def get_results():
+    form = await request.form
+    state_name = form['state']
+    city_name = form['city'].replace("/", ",")
     if city_name== "ALL":
         directory = f"states/{state_name}/"
         paths = []
@@ -104,14 +105,12 @@ def get_results():
         for f in sorted(os.listdir(dir)) if f.endswith(".pdf")
     ]
     #print(paths)
-    min_mark = int(request.form['min_mark'])
-    max_mark = int(request.form['max_mark'])
+    min_mark = int(form['min_mark'])
+    max_mark = int(form['max_mark'])
     NoOfStudents = 0
     for path in paths:
         no, d = analyze_marks(extract_marks_from_pdf(path), min_mark, max_mark)
         NoOfStudents += no
-
-
     return jsonify(count_in_range=NoOfStudents, min_mark=min_mark, max_mark=max_mark)
 
 
