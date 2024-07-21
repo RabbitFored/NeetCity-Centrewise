@@ -94,7 +94,10 @@
             <select name="city" id="city" required>
                 <option value="">Select a city</option>
             </select>
-
+            <label for="centre">Centre:</label>
+            <select name="centre" id="centre" required>
+                <option value="">Select a centre</option>
+            </select>
             <label for="min_mark">Min Mark:</label>
             <input type="number" name="min_mark" id="min_mark" required>
 
@@ -121,6 +124,21 @@
                         $('#city').empty().append('<option value="">Select a city</option>');
                         $.each(data, function(index, value) {
                             $('#city').append('<option value="' + value + '">' + value + '</option>');
+                        });
+                    }
+                });
+            });
+$('#city').change(function() {
+                var state = $('#state').val();
+                var city = $(this).val();
+                $.ajax({
+                    url: '/get_centres',
+                    method: 'POST',
+                    data: { state: state , city:city},
+                    success: function(data) {
+                        $('#centre').empty().append('<option value="">Select a centre</option>');
+                        $.each(data, function(index, value) {
+                            $('#centre').append('<option value="' + value + '">' + value + '</option>');
                         });
                     }
                 });

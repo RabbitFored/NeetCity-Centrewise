@@ -83,12 +83,30 @@ async def get_cities():
             for city in state["cities"]:
                 cities.append(city["name"])
     return jsonify(cities)
+@app.route('/get_centres', methods=['POST'])
+async def get_centres():
+    form = await request.form
+    sta = form['state']
+    cit = form['city']
+    centres = ["ALL"]
+    if cit == "ALL":
+        return jsonify(centres)
+    for state in data["states"]:
+        state_name = state["name"]
+        if sta == state_name:
+            for city in state["cities"]:
+                if cit == city['name']:
+                    for centre in city["centres"]:
+                        centres.append(centre["name"])
+                #cities.append(city["name"])
+    return jsonify(centres)
 
 @app.route('/get_results', methods=['POST'])
 async def get_results():
     form = await request.form
     state_name = form['state']
     city_name = form['city'].replace("/", ",")
+    centre_name = form['centre']
     if city_name== "ALL":
         directory = f"states/{state_name}/"
         paths = []
@@ -96,14 +114,24 @@ async def get_results():
          for j in i[2]:
           if j.endswith('.pdf'):
             paths.append( os.path.join(i[0], j))
-
-    else:
+    elif centre_name == "ALL":
+    
         dir = f"states/{state_name}/{city_name}"
 
         paths = [
       os.path.join(dir, f)
-        for f in sorted(os.listdir(dir)) if f.endswith(".pdf")
-    ]
+        for f in sorted(os.listdir(dir)) if f.endswith(".pdf")]
+    else:
+        for state in data["states"]:
+         #state_name = state["name"]
+          if state_name == state["name"]:
+            for city in state["cities"]:
+                if city_name == city['name']:
+                    for centre in city["centres"]:
+                        if centre_name == centre["name"]:
+                            centre_code = centre["code"]
+                        #centres.append(centre["name"])
+        paths = [f"states/{state_name}/{city_name}/{centre_code}.pdf"]
     #print(paths)
     min_mark = int(form['min_mark'])
     max_mark = int(form['max_mark'])
