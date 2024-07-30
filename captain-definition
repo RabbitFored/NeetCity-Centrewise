@@ -1,5 +1,5 @@
 {
-	"schemaVersion" :1 ,
+	"schemaVersion" :2 ,
 	"dockerfileLines" :[
 		"FROM python:3.7.0-alpine",
 		"COPY ./src /app",
